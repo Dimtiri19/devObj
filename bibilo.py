@@ -1,6 +1,6 @@
 import json
 
-class Bibliothèque:
+class Bibliotheque:
     def __init__(self, id, titre, auteur, annee):
         """
         PRE: - id est une chaîne non vide
