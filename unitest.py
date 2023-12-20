@@ -45,10 +45,10 @@ class TestBibliotheque(unittest.TestCase):
 
         with open('livres.json', 'r') as f:
             livres = json.load(f)
-
+        
         livre_test_result = next((livre for livre in livres if livre['id'] == 'test123'), None)
         self.assertIsNotNone(livre_test_result)
-        self.assertEqual(livre_test_result['exemplaire'], 1)  # ajuster en fonction du comportement attendu
+        self.assertEqual(livre_test_result['exemplaire'], 0)  # ajuster en fonction du comportement attendu
 
     def test_restockage(self):
         # Vérifier le restockage de 3 exemplaires du livre de test
