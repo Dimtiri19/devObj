@@ -2,6 +2,13 @@ import json
 
 class Bibliothèque:
     def __init__(self, id, titre, auteur, annee):
+        """
+        PRE: - id est une chaîne non vide
+             - titre est une chaîne non vide
+             - auteur est une chaîne non vide
+             - annee est un entier positif
+        POST: Un livre est ajouté à la bibliothèque avec les propriétés spécifiées.
+        """
         self.id = id
         self.titre = titre
         self.auteur = auteur
@@ -10,6 +17,13 @@ class Bibliothèque:
         self.ajouter_livre()
 
     def ajouter_livre(self):
+        """
+        PRE: - exemplaire est un entier positif
+        POST: Le livre est ajouté à la bibliothèque avec le nombre d'exemplaires spécifié.
+        """
+        if self.exemplaire <= 0:
+            raise ValueError("Le nombre d'exemplaires doit être strictement supérieur à 0.")
+
         try:
             with open('livres.json', 'r') as f:
                 livres = json.load(f)
@@ -19,7 +33,7 @@ class Bibliothèque:
         livre_existant = False
         for livre in livres:
             if livre.get('id') == self.id:
-                livre['exemplaire'] += 1
+                livre['exemplaire'] += self.exemplaire
                 livre_existant = True
                 break
 
@@ -29,7 +43,7 @@ class Bibliothèque:
                 "titre": self.titre,
                 "auteur": self.auteur,
                 "annee": self.annee,
-                "exemplaire": 1
+                "exemplaire": self.exemplaire
             }
             livres.append(nouveau_livre)
 
@@ -37,6 +51,10 @@ class Bibliothèque:
             json.dump(livres, f, indent=2)
 
     def afficher_stock(self, matricule=None):
+        """
+        PRE: Aucune
+        POST: Les informations sur le stock sont affichées pour le matricule spécifié ou pour tous les livres.
+        """
         try:
             with open('livres.json', 'r') as f:
                 livres = json.load(f)
@@ -48,6 +66,11 @@ class Bibliothèque:
                 print(f"Matricule: {livre['id']}, Exemplaires: {livre['exemplaire']}")
 
     def emprunter(self, matricule, nb_exemplaires):
+        """
+        PRE: - matricule est une chaîne non vide
+             - nb_exemplaires est un entier positif
+        POST: Le nombre d'exemplaires spécifié est emprunté pour le matricule spécifié.
+        """
         if nb_exemplaires <= 0:
             raise ValueError("Le nombre d'exemplaires doit être strictement supérieur à 0.")
 
@@ -71,19 +94,30 @@ class Bibliothèque:
         with open('livres.json', 'w') as f:
             json.dump(livres, f, indent=2)
 
-# Exemple d'utilisation
-nouveau_livre1 = Bibliothèque("aze", "Harry Potter à l'école des sorciers", "J.K. Rowling", 1997)
-nouveau_livre2 = Bibliothèque("123", "Le Seigneur des Anneaux", "J.R.R. Tolkien", 1954)
+    def restockage(self, matricule, nb_exemplaires):
+        """
+        PRE: - matricule est une chaîne non vide
+             - nb_exemplaires est un entier positif
+        POST: Le nombre d'exemplaires spécifié est ajouté au stock pour le matricule spécifié.
+        """
+        if nb_exemplaires <= 0:
+            raise ValueError("Le nombre d'exemplaires à rajouter doit être strictement supérieur à 0.")
 
-# Afficher le stock
-nouveau_livre1.afficher_stock()
+        try:
+            with open('livres.json', 'r') as f:
+                livres = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            raise Exception("Aucun livre disponible.")
 
-# Emprunter 1 exemplaire du livre avec le matricule "aze"
-try:
-    nouveau_livre1.emprunter("aze", 1)
-    print("Emprunt réussi.")
-except Exception as e:
-    print(f"Erreur: {e}")
+        livre_existant = False
+        for livre in livres:
+            if livre['id'] == matricule:
+                livre['exemplaire'] += nb_exemplaires
+                livre_existant = True
+                break
 
-# Afficher le stock après l'emprunt
-nouveau_livre1.afficher_stock()
+        if not livre_existant:
+            raise ValueError(f"Le matricule '{matricule}' n'existe pas dans la bibliothèque.")
+
+        with open('livres.json', 'w') as f:
+            json.dump(livres, f, indent=2)

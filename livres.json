@@ -4,13 +4,13 @@
     "titre": "Harry Potter \u00e0 l'\u00e9cole des sorciers",
     "auteur": "J.K. Rowling",
     "annee": 1997,
-    "exemplaire": 2
+    "exemplaire": 6
   },
   {
     "id": "123",
     "titre": "Le Seigneur des Anneaux",
     "auteur": "J.R.R. Tolkien",
     "annee": 1954,
-    "exemplaire": 3
+    "exemplaire": 5
   }
 ]
