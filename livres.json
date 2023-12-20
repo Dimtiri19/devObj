@@ -1,13 +1,13 @@
 [
   {
-    "id": "aze",
+    "identifiant": "aze",
     "titre": "Harry Potter \u00e0 l'\u00e9cole des sorciers",
     "auteur": "J.K. Rowling",
     "annee": 1997,
     "exemplaire": 6
   },
   {
-    "id": "123",
+    "identifiant": "123",
     "titre": "Le Seigneur des Anneaux",
     "auteur": "J.R.R. Tolkien",
     "annee": 1954,

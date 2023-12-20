@@ -1,28 +1,46 @@
 import json
 
 class Bibliotheque:
-    def __init__(self, id, titre, auteur, annee):
+    def __init__(self, identifiant, titre, auteur, annee):
         """
-        PRE: - id est une chaîne non vide
+        PRE: - identifiant est une chaîne non vide
              - titre est une chaîne non vide
              - auteur est une chaîne non vide
              - annee est un entier positif
         POST: Un livre est ajouté à la bibliothèque avec les propriétés spécifiées.
         """
-        self.id = id
+        self.verifier_parametres(identifiant, titre, auteur, annee)
+        
+        self.identifiant = identifiant
         self.titre = titre
         self.auteur = auteur
         self.annee = annee
         self.exemplaire = 1  # par défaut, un exemplaire lors de la création
         self.ajouter_livre()
 
+    def verifier_parametres(self, identifiant, titre, auteur, annee):
+        if not identifiant:
+            raise ValueError("L'identifiant ne peut pas être une chaîne vide.")
+        
+        if not titre:
+            raise ValueError("Le titre ne peut pas être une chaîne vide.")
+        
+        if not auteur:
+            raise ValueError("L'auteur ne peut pas être une chaîne vide.")
+        
+        if not isinstance(annee, int):
+            raise ValueError("L'année doit être un entier.")
+        
+        if annee <= 0:
+            raise ValueError("L'année doit être un entier positif.")
+
     def ajouter_livre(self):
         """
         PRE: - exemplaire est un entier positif
         POST: Le livre est ajouté à la bibliothèque avec le nombre d'exemplaires spécifié.
         """
-        if self.exemplaire <= 0:
-            raise ValueError("Le nombre d'exemplaires doit être strictement supérieur à 0.")
+        if not isinstance(self.exemplaire, int) or self.exemplaire <= 0:
+            raise ValueError("Le nombre d'exemplaires doit être un entier strictement positif.")
 
         try:
             with open('livres.json', 'r') as f:
@@ -32,14 +50,14 @@ class Bibliotheque:
 
         livre_existant = False
         for livre in livres:
-            if livre.get('id') == self.id:
+            if livre.get('identifiant') == self.identifiant:
                 livre['exemplaire'] += self.exemplaire
                 livre_existant = True
                 break
 
         if not livre_existant:
             nouveau_livre = {
-                "id": self.id,
+                "identifiant": self.identifiant,
                 "titre": self.titre,
                 "auteur": self.auteur,
                 "annee": self.annee,
@@ -62,8 +80,8 @@ class Bibliotheque:
             livres = []
 
         for livre in livres:
-            if matricule is None or livre['id'] == matricule:
-                print(f"Matricule: {livre['id']}, Exemplaires: {livre['exemplaire']}")
+            if matricule is None or livre['identifiant'] == matricule:
+                print(f"Matricule: {livre['identifiant']}, Exemplaires: {livre['exemplaire']}")
 
     def emprunter(self, matricule, nb_exemplaires):
         """
@@ -71,8 +89,8 @@ class Bibliotheque:
              - nb_exemplaires est un entier positif
         POST: Le nombre d'exemplaires spécifié est emprunté pour le matricule spécifié.
         """
-        if nb_exemplaires <= 0:
-            raise ValueError("Le nombre d'exemplaires doit être strictement supérieur à 0.")
+        if not isinstance(nb_exemplaires, int) or nb_exemplaires <= 0:
+            raise ValueError("Le nombre d'exemplaires doit être un entier strictement positif.")
 
         try:
             with open('livres.json', 'r') as f:
@@ -81,12 +99,14 @@ class Bibliotheque:
             raise Exception("Aucun livre disponible.")
 
         for livre in livres:
-            if livre['id'] == matricule:
+            if livre['identifiant'] == matricule:
                 try:
+                    print(f"Avant emprunt : {livre['exemplaire']}")
                     if livre['exemplaire'] - nb_exemplaires < 0:
                         raise ValueError("Pas assez d'exemplaires disponibles.")
                     else:
                         livre['exemplaire'] -= nb_exemplaires
+                        print(f"Après emprunt : {livre['exemplaire']}")
                         break
                 except ValueError as e:
                     raise e
@@ -100,8 +120,8 @@ class Bibliotheque:
              - nb_exemplaires est un entier positif
         POST: Le nombre d'exemplaires spécifié est ajouté au stock pour le matricule spécifié.
         """
-        if nb_exemplaires <= 0:
-            raise ValueError("Le nombre d'exemplaires à rajouter doit être strictement supérieur à 0.")
+        if not isinstance(nb_exemplaires, int) or nb_exemplaires <= 0:
+            raise ValueError("Le nombre d'exemplaires à rajouter doit être un entier strictement positif.")
 
         try:
             with open('livres.json', 'r') as f:
@@ -111,7 +131,7 @@ class Bibliotheque:
 
         livre_existant = False
         for livre in livres:
-            if livre['id'] == matricule:
+            if livre['identifiant'] == matricule:
                 livre['exemplaire'] += nb_exemplaires
                 livre_existant = True
                 break

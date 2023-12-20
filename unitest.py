@@ -5,6 +5,65 @@ import json
 from bibilo import Bibliotheque
 
 class TestBibliotheque(unittest.TestCase):
+    def test_creation_instance_erreur(self):
+        # Teste la création d'une instance avec des paramètres incorrects
+        with self.assertRaises(ValueError):
+            Bibliotheque("", "Titre Test", "Auteur Test", 2022)  # ID vide
+
+        with self.assertRaises(ValueError):
+            Bibliotheque("test123", "", "Auteur Test", 2022)  # Titre vide
+
+        with self.assertRaises(ValueError):
+            Bibliotheque("test123", "Titre Test", "", 2022)  # Auteur vide
+
+        with self.assertRaises(ValueError):
+            Bibliotheque("test123", "Titre Test", "Auteur Test", -2022)  # Année négative
+
+        with self.assertRaises(ValueError):
+            Bibliotheque("test123", "Titre Test", "Auteur Test", "2022")  # Année non entière
+
+    def test_ajouter_livre_erreur(self):
+        # Teste la méthode ajouter_livre avec des paramètres incorrects
+        livre_test = Bibliotheque("test123", "Titre Test", "Auteur Test", 2022)
+
+        with self.assertRaises(ValueError):
+            livre_test.exemplaire = 0
+            livre_test.ajouter_livre()  # exemplaire <= 0
+
+        with self.assertRaises(ValueError):
+            livre_test.exemplaire = -1
+            livre_test.ajouter_livre()  # exemplaire < 0
+
+        with self.assertRaises(ValueError):
+            livre_test.exemplaire = "1"
+            livre_test.ajouter_livre()  # exemplaire non entier
+
+    def test_emprunter_erreur(self):
+        # Teste la méthode emprunter avec des paramètres incorrects
+        livre_test = Bibliotheque("test123", "Titre Test", "Auteur Test", 2022)
+
+        with self.assertRaises(ValueError):
+            livre_test.emprunter('test123', 0)  # nb_exemplaires <= 0
+
+        with self.assertRaises(ValueError):
+            livre_test.emprunter('test123', -1)  # nb_exemplaires < 0
+
+        with self.assertRaises(ValueError):
+            livre_test.emprunter('test123', '1')  # nb_exemplaires non entier
+
+    def test_restockage_erreur(self):
+        # Teste la méthode restockage avec des paramètres incorrects
+        livre_test = Bibliotheque("test123", "Titre Test", "Auteur Test", 2022)
+
+        with self.assertRaises(ValueError):
+            livre_test.restockage('test123', 0)  # nb_exemplaires <= 0
+
+        with self.assertRaises(ValueError):
+            livre_test.restockage('test123', -1)  # nb_exemplaires < 0
+
+        with self.assertRaises(ValueError):
+            livre_test.restockage('test123', '1')  # nb_exemplaires non entier
+
     def setUp(self):
         # Créer un livre pour les tests
         self.livre_test = Bibliotheque("test123", "Titre Test", "Auteur Test", 2022)
@@ -17,7 +76,7 @@ class TestBibliotheque(unittest.TestCase):
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             livres = []
 
-        livres = [livre for livre in livres if livre['id'] != 'test123']
+        livres = [livre for livre in livres if livre['identifiant'] != 'test123']
 
         with open('livres.json', 'w') as f:
             json.dump(livres, f, indent=2)
@@ -29,7 +88,7 @@ class TestBibliotheque(unittest.TestCase):
         with open('livres.json', 'r') as f:
             livres = json.load(f)
 
-        livre_test_result = next((livre for livre in livres if livre['id'] == 'test123'), None)
+        livre_test_result = next((livre for livre in livres if livre['identifiant'] == 'test123'), None)
         self.assertIsNotNone(livre_test_result)
         self.assertEqual(livre_test_result['exemplaire'], 2)  # ajuster en fonction du comportement attendu
 
@@ -46,7 +105,7 @@ class TestBibliotheque(unittest.TestCase):
         with open('livres.json', 'r') as f:
             livres = json.load(f)
         
-        livre_test_result = next((livre for livre in livres if livre['id'] == 'test123'), None)
+        livre_test_result = next((livre for livre in livres if livre['identifiant'] == 'test123'), None)
         self.assertIsNotNone(livre_test_result)
         self.assertEqual(livre_test_result['exemplaire'], 0)  # ajuster en fonction du comportement attendu
 
@@ -57,7 +116,7 @@ class TestBibliotheque(unittest.TestCase):
         with open('livres.json', 'r') as f:
             livres = json.load(f)
 
-        livre_test_result = next((livre for livre in livres if livre['id'] == 'test123'), None)
+        livre_test_result = next((livre for livre in livres if livre['identifiant'] == 'test123'), None)
         self.assertIsNotNone(livre_test_result)
         self.assertEqual(livre_test_result['exemplaire'], 4)  # ajuster en fonction du comportement attendu
 
